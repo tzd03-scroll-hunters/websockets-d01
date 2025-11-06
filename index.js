@@ -32,7 +32,23 @@ const io = new SocketServer(httpServer, {
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
-  setInterval(() => {
-    socket.emit('welcome', 'Welcome to the Socket.IO server!' + Date.now());
-  }, 2000);
+  // sende nachricht gleich nach dem connect
+  socket.emit("message", "Welcome new client!");
+
+  // beispiel: jede sekunde sende ein UPDATE an den client
+  // setInterval(() => {
+  //   socket.emit("update", "Server Zeit: " + new Date().toLocaleTimeString());
+  // }, 1000)
+
+  // öffne einen socket message channel
+  socket.on("message", (data) => {
+    console.log("Received message from client:", data);
+
+    // sendet an ALLE anderen user außer den sender
+    socket.broadcast.emit("message", data);
+    
+    // sendet an ALLE anderen user und an den sender
+    // io.emit("message", data);
+  })
+
 })
